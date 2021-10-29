@@ -1,6 +1,6 @@
 import { find } from 'lodash'
 import classNames from 'classnames'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { arrayMove } from 'react-sortable-hoc'
 import { useAsyncEffect } from 'use-async-effect'
 import { SortableContainer, SortableElement } from 'react-sortable-hoc'
@@ -14,6 +14,7 @@ export interface ISchemaProps {
   source?: string | File
   schema: IDict | File
   onSave: any
+  onSchemaChanged?: (schema: any, error: any) => void
   disablePreview: boolean
   disableSave: boolean
 }
@@ -41,10 +42,19 @@ export function Schema(props: ISchemaProps) {
     }
   }, [])
 
+  const memoizedExportSchema = useCallback(() => helpers.exportSchema(columns, metadata), [columns, metadata])
+
+  useEffect(() => {
+    if (props.onSchemaChanged) {
+      const schema = memoizedExportSchema()
+      props.onSchemaChanged(schema, error)
+    }
+  }, [columns, metadata, error])
+
   // Save
   const saveSchema = () => {
     if (props.onSave) {
-      const schema = helpers.exportSchema(columns, metadata)
+      const schema = memoizedExportSchema()
       props.onSave(schema, error)
     }
   }
