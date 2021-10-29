@@ -42,7 +42,10 @@ export function Schema(props: ISchemaProps) {
     }
   }, [])
 
-  const memoizedExportSchema = useCallback(() => helpers.exportSchema(columns, metadata), [columns, metadata])
+  const memoizedExportSchema = useCallback(
+    () => helpers.exportSchema(columns, metadata),
+    [columns, metadata]
+  )
 
   useEffect(() => {
     if (props.onSchemaChanged) {
